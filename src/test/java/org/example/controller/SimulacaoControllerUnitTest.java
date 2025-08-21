@@ -44,17 +44,26 @@ class SimulacaoControllerUnitTest {
     void simularErro() {
         SimulacaoRequestDTO request = new SimulacaoRequestDTO();
         when(simulacaoService.fluxoCompletoSimulacaoDTO(any())).thenThrow(new RuntimeException("erro"));
-        ResponseEntity<SimulacaoResponseDTO> result = controller.simular(request);
-        assertEquals(500, result.getStatusCodeValue());
+        assertThrows(RuntimeException.class, () -> controller.simular(request));
     }
 
     @Test
     void listarSimulacoesSucesso() {
+        SimulacaoResumoDTO resumo = new SimulacaoResumoDTO();
+        resumo.setIdSimulacao(1L);
+        resumo.setValorDesejado(1000.0);
+        resumo.setPrazo(12);
+        resumo.setValorTotalParcelasSac(1200.0);
+        resumo.setValorTotalParcelasPrice(1250.0);
         PaginatedResponseDTO<SimulacaoResumoDTO> paginated = new PaginatedResponseDTO<>();
+        paginated.setContent(Collections.singletonList(resumo));
         when(simulacaoService.listarSimulacoesPaginado(anyInt(), anyInt())).thenReturn(paginated);
         ResponseEntity<PaginatedResponseDTO<SimulacaoResumoDTO>> result = controller.listarSimulacoes(1, 10);
         assertEquals(200, result.getStatusCodeValue());
         assertEquals(paginated, result.getBody());
+        SimulacaoResumoDTO dto = result.getBody().getContent().get(0);
+        assertEquals(1200.0, dto.getValorTotalParcelasSac());
+        assertEquals(1250.0, dto.getValorTotalParcelasPrice());
     }
 
     @Test

@@ -161,21 +161,43 @@ public class SimulacaoService {
         Simulacao simulacao = new Simulacao();
         simulacao.setValorSolicitado(env.getValorDesejado());
         simulacao.setPrazo(env.getPrazo());
-        Produto produto = produtoService.listarProdutos().stream().findFirst().orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        // Filtrar produtos que atendam aos critérios de valor e prazo
+        List<Produto> produtosValidos = produtoService.listarProdutos().stream()
+            .filter(p -> {
+                boolean valorOk = env.getValorDesejado() != null &&
+                    BigDecimal.valueOf(env.getValorDesejado()).compareTo(p.getValorMinimo()) >= 0 &&
+                    (p.getValorMaximo() == null || BigDecimal.valueOf(env.getValorDesejado()).compareTo(p.getValorMaximo()) <= 0);
+                boolean prazoOk = env.getPrazo() != null &&
+                    env.getPrazo() >= p.getPrazoMinimo() &&
+                    (p.getPrazoMaximo() == null || env.getPrazo() <= p.getPrazoMaximo());
+                return valorOk && prazoOk;
+            })
+            .toList();
+        if (produtosValidos.isEmpty()) {
+            throw new org.example.exception.BusinessException("Não há produtos disponíveis para os parâmetros informados.");
+        }
+        Produto produto = produtosValidos.get(0); // Seleciona o primeiro produto válido
         simulacao.setProduto(produto.getNome());
-        simulacao.setTaxaJuros(produto.getTaxaJuros() != null ? produto.getTaxaJuros().doubleValue() : null);
+        Double taxaJurosDouble = null;
+        if (produto.getTaxaJuros() != null) {
+            taxaJurosDouble = produto.getTaxaJuros().doubleValue();
+        }
+        simulacao.setTaxaJuros(taxaJurosDouble);
         // Calcular SAC e PRICE usando as estratégias refatoradas
         SimulacaoStrategy sacStrategy = simulacaoStrategyFactory.getStrategy("Sac");
         SimulacaoStrategy priceStrategy = simulacaoStrategyFactory.getStrategy("Price");
-        SimulacaoResponseDTO.ResultadoSimulacao sac = sacStrategy.calcularParcelas(env, produto.getTaxaJuros().doubleValue());
+        if (taxaJurosDouble == null) {
+            throw new org.example.exception.BusinessException("Produto selecionado não possui taxa de juros definida.");
+        }
+        SimulacaoResponseDTO.ResultadoSimulacao sac = sacStrategy.calcularParcelas(env, taxaJurosDouble);
         sac.setTipo("SAC");
-        SimulacaoResponseDTO.ResultadoSimulacao price = priceStrategy.calcularParcelas(env, produto.getTaxaJuros().doubleValue());
+        SimulacaoResponseDTO.ResultadoSimulacao price = priceStrategy.calcularParcelas(env, taxaJurosDouble);
         price.setTipo("PRICE");
         Simulacao salva = salvarSimulacao(simulacao);
         SimulacaoResponseDTO response = new SimulacaoResponseDTO();
         SimulacaoResponseDTO.ModeloEnvelopeRetornoSimulacao envResp = new SimulacaoResponseDTO.ModeloEnvelopeRetornoSimulacao();
         envResp.setIdSimulacao(salva.getId());
-        envResp.setCodigoProduto(1); // Exemplo fixo, ajustar conforme regra
+        envResp.setCodigoProduto(produto.getId());
         envResp.setDescricaoProduto(produto.getNome());
         envResp.setTaxaJuros(salva.getTaxaJuros());
         ArrayList<SimulacaoResponseDTO.ResultadoSimulacao> resultados = new ArrayList<>();
@@ -217,7 +239,22 @@ public class SimulacaoService {
                 dto.setIdSimulacao(s.getId());
                 dto.setValorDesejado(s.getValorSolicitado());
                 dto.setPrazo(s.getPrazo());
-                dto.setValorTotalParcelas(s.getValorSolicitado()); // Ajuste se necessário
+                // Buscar produto pelo nome
+                Produto produto = produtoService.buscarPorNome(s.getProduto());
+                if (produto != null) {
+                    // Estratégias SAC e Price
+                    SimulacaoStrategy sacStrategy = simulacaoStrategyFactory.getStrategy("Sac");
+                    SimulacaoStrategy priceStrategy = simulacaoStrategyFactory.getStrategy("Price");
+                    List<org.example.dto.SimulacaoResponseDTO.Parcela> sacParcelas = sacStrategy.calcular(s, produto);
+                    List<org.example.dto.SimulacaoResponseDTO.Parcela> priceParcelas = priceStrategy.calcular(s, produto);
+                    double totalSac = sacParcelas.stream().mapToDouble(p -> p.getValorPrestacao()).sum();
+                    double totalPrice = priceParcelas.stream().mapToDouble(p -> p.getValorPrestacao()).sum();
+                    dto.setValorTotalParcelasSac(totalSac);
+                    dto.setValorTotalParcelasPrice(totalPrice);
+                } else {
+                    dto.setValorTotalParcelasSac(null);
+                    dto.setValorTotalParcelasPrice(null);
+                }
                 content.add(dto);
             }
         }

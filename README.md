@@ -1,3 +1,24 @@
+# Tecnologias utilizadas
+
+- Java 17 (Spring Boot)
+- SQL Server (banco externo para consulta de produtos)
+- H2 Database (banco local para simulações em dev/test)
+- Docker e Docker Compose
+- Terraform (provisionamento de infraestrutura)
+- Vault (gestão de segredos)
+- Nginx (load balancer/reverse proxy)
+- Prometheus (monitoramento)
+- Grafana (dashboards)
+- EventHub (integração simulada)
+- Jacoco (cobertura de testes)
+- JUnit 5 (testes automatizados)
+- Swagger/OpenAPI (documentação da API)
+- Resilience4j (circuit breaker, rate limiter)
+- Caffeine (cache)
+- Postman (coleção de testes)
+- K6 (testes de carga)
+- (Opcional) Graylog, Zipkin, GitHub Actions (CI/CD)
+
 # Descrição do Produto
 
 Produto 1

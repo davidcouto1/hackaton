@@ -74,8 +74,8 @@ public class SimulacaoController {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Void> handleBusinessException(BusinessException ex) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<Object> handleBusinessException(BusinessException ex) {
+        return ResponseEntity.badRequest().body(java.util.Collections.singletonMap("erro", ex.getMessage()));
     }
 
     @Operation(summary = "Lista todas as simulações", description = "Retorna todas as simulações cadastradas.\n\nRequer autenticação HTTP Basic (Authorization: Basic ...).",

@@ -127,6 +127,19 @@ class SimulacaoServiceTest {
     }
 
     @Test
+    void testFluxoCompletoSimulacaoDTONenhumProdutoValido() {
+        // Nenhum produto válido para os parâmetros informados
+        when(produtoService.listarProdutos()).thenReturn(Collections.emptyList());
+        SimulacaoRequestDTO.ModeloEnvelopeSimulacao env = new SimulacaoRequestDTO.ModeloEnvelopeSimulacao();
+        env.setValorDesejado(9999999.0); // Valor fora de qualquer faixa
+        env.setPrazo(999); // Prazo fora de qualquer faixa
+        SimulacaoRequestDTO req = new SimulacaoRequestDTO();
+        req.setModeloEnvelopeSimulacao(env);
+        Exception ex = assertThrows(org.example.exception.BusinessException.class, () -> simulacaoService.fluxoCompletoSimulacaoDTO(req));
+        assertEquals("Não há produtos disponíveis para os parâmetros informados.", ex.getMessage());
+    }
+
+    @Test
     void testEnviarParaEventHubDeveLidarComFalha() {
         doThrow(new RuntimeException("EventHub fora do ar")).when(eventHubService).enviarMensagem(anyString());
         // Simula chamada que dispara envio para EventHub

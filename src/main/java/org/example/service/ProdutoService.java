@@ -22,4 +22,8 @@ public class ProdutoService {
     public Optional<Produto> buscarPorId(Long id) {
         return produtoRepository.findById(id);
     }
+
+    public Produto buscarPorNome(String nome) {
+        return produtoRepository.findByNome(nome);
+    }
 }
