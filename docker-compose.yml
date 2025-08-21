@@ -1,32 +1,15 @@
 version: '3.8'
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Password23
-    ports:
-      - "1433:1433"
-    networks:
-      - hackaton-net
-    healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "hack", "-P", "Password23", "-Q", "select 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - ./scripts/init-db.sql:/var/opt/mssql/scripts/init-db.sql:ro
-      - ./scripts/init-produto.sql:/var/opt/mssql/scripts/init-produto.sql:ro
-    command: ["/bin/bash", "-c", "/opt/mssql/bin/sqlservr & sleep 30 && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Password23 -i /var/opt/mssql/scripts/init-db.sql && tail -f /dev/null"]
-
   app1:
     build: .
     container_name: simulador-api-1
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=hack
-      - SPRING_DATASOURCE_USERNAME=hack
-      - SPRING_DATASOURCE_PASSWORD=Password23
+      - SPRING_DATASOURCE_URL=${SIMULACAO_DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${SIMULACAO_DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SIMULACAO_DB_PASSWORD}
+      - SPRING_PRODUTO-DATASOURCE_URL=jdbc:sqlserver://dbhackathon.database.windows.net:1433;databaseName=hack
+      - SPRING_PRODUTO-DATASOURCE_USERNAME=hack
+      - SPRING_PRODUTO-DATASOURCE_PASSWORD=Password23
     networks:
       - hackaton-net
     expose:
@@ -36,9 +19,12 @@ services:
     build: .
     container_name: simulador-api-2
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=hack
-      - SPRING_DATASOURCE_USERNAME=hack
-      - SPRING_DATASOURCE_PASSWORD=Password23
+      - SPRING_DATASOURCE_URL=${SIMULACAO_DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${SIMULACAO_DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SIMULACAO_DB_PASSWORD}
+      - SPRING_PRODUTO-DATASOURCE_URL=jdbc:sqlserver://dbhackathon.database.windows.net:1433;databaseName=hack
+      - SPRING_PRODUTO-DATASOURCE_USERNAME=hack
+      - SPRING_PRODUTO-DATASOURCE_PASSWORD=Password23
     networks:
       - hackaton-net
     expose:
@@ -148,24 +134,8 @@ services:
       - "8200:8200"
     cap_add:
       - IPC_LOCK
-    command: server -dev
-    environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=dev-root
     networks:
       - hackaton-net
-
-  init-vault:
-    image: hashicorp/vault:latest
-    container_name: init-vault
-    entrypoint: ["/bin/sh", "/init-vault.sh"]
-    environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=dev-root
-    depends_on:
-      - vault
-    networks:
-      - hackaton-net
-    volumes:
-      - ./scripts/init-vault.sh:/init-vault.sh:ro
 
 networks:
   hackaton-net:

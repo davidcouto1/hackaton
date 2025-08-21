@@ -92,7 +92,7 @@
           "header": [
             { "key": "Content-Type", "value": "application/json" }
           ],
-          "body": "{\n  \"pagina\": 1,\n  \"qtdRegistros\": 404,\n  \"qtdRegistrosPagina\": 200,\n  \"registros\": [\n    {\n      \"idSimulacao\": 20180702,\n      \"valorDesejado\": 900.00,\n      \"prazo\": 5,\n      \"valorTotalParcelas\": 1243.28\n    }\n  ]\n}"
+          "body": "{\n  \"pagina\": 1,\n  \"qtdRegistros\": 404,\n  \"qtdRegistrosPagina\": 200,\n  \"registros\": [\n    {\n      \"idSimulacao\": 20180702,\n      \"valorDesejado\": 900.00,\n      \"prazo\": 5,\n      \"valorTotalSac\": 1243.28,\n      \"valorTotalPrice\": 1234.56\n    }\n  ]\n}"
         }
       ]
     },

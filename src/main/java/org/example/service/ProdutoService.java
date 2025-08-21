@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.model.Produto;
-import org.example.repository.ProdutoRepository;
+import org.example.repository.produto.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

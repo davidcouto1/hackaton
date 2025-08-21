@@ -3,7 +3,7 @@ package org.example.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.model.Produto;
 import org.example.model.Simulacao;
-import org.example.repository.SimulacaoRepository;
+import org.example.repository.simulacao.SimulacaoRepository;
 import org.example.repository.AuditoriaRepository;
 import org.example.model.Auditoria;
 import org.springframework.stereotype.Service;

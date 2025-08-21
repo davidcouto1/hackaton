@@ -101,7 +101,12 @@ mvn test -Dspring.profiles.active=test
 4. Acesse a API e o Swagger como acima
 
 ## Arquivos de inicialização do banco
-- `init-db.sql` e `init-produto.sql` podem ser usados para popular o banco SQL Server com a tabela e dados de produtos do desafio.
+
+> **Atenção:** Não é necessário rodar os scripts `init-db.sql` e `init-produto.sql` para a tabela de produtos. Os produtos já estão cadastrados no banco SQL Server externo fornecido pelo desafio (`dbhackathon.database.windows.net`). A aplicação consulta diretamente esse banco para obter os produtos.
+
+Os scripts de inicialização podem ser usados apenas para testes locais, caso deseje simular um ambiente próprio. No entanto, para o desafio, utilize sempre o banco externo para consulta de produtos.
+
+O banco local (H2 ou outro) é utilizado apenas para persistir as simulações realizadas, conforme solicitado no desafio.
 
 ## Modelos de envelope e exemplos de uso
 ### Envelope de solicitação de simulação

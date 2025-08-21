@@ -1,4 +1,4 @@
-package org.example.repository;
+package org.example.repository.simulacao;
 
 import org.example.model.Simulacao;
 import org.springframework.data.jpa.repository.JpaRepository;
