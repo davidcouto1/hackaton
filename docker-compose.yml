@@ -1,0 +1,172 @@
+version: '3.8'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password23
+    ports:
+      - "1433:1433"
+    networks:
+      - hackaton-net
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "hack", "-P", "Password23", "-Q", "select 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./scripts/init-db.sql:/var/opt/mssql/scripts/init-db.sql:ro
+      - ./scripts/init-produto.sql:/var/opt/mssql/scripts/init-produto.sql:ro
+    command: ["/bin/bash", "-c", "/opt/mssql/bin/sqlservr & sleep 30 && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Password23 -i /var/opt/mssql/scripts/init-db.sql && tail -f /dev/null"]
+
+  app1:
+    build: .
+    container_name: simulador-api-1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=hack
+      - SPRING_DATASOURCE_USERNAME=hack
+      - SPRING_DATASOURCE_PASSWORD=Password23
+    networks:
+      - hackaton-net
+    expose:
+      - "8080"
+
+  app2:
+    build: .
+    container_name: simulador-api-2
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=hack
+      - SPRING_DATASOURCE_USERNAME=hack
+      - SPRING_DATASOURCE_PASSWORD=Password23
+    networks:
+      - hackaton-net
+    expose:
+      - "8080"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app1
+      - app2
+    networks:
+      - hackaton-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - hackaton-net
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-loadbalancer
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - app1
+      - app2
+    networks:
+      - hackaton-net
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - hackaton-net
+    depends_on:
+      - app1
+      - app2
+
+  mongo:
+    image: mongo:4.2
+    container_name: mongo
+    networks:
+      - hackaton-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    networks:
+      - hackaton-net
+
+  graylog:
+    image: graylog/graylog:5.2
+    container_name: graylog
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      - GRAYLOG_ROOT_PASSWORD_SHA2=2bb80d537b1da3e38bd30361aa855686bde0baefbfa6b8b0d3255b9c8c6fa0c6 # echo -n admin | sha256sum
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9000/
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GRAYLOG_MONGODB_URI=mongodb://mongo:27017/graylog
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      - "9000:9000"   # Web UI
+      - "12201:12201/udp" # GELF UDP
+      - "1514:1514"
+    networks:
+      - hackaton-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - hackaton-net
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: dev-vault
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    command: server -dev
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=dev-root
+    networks:
+      - hackaton-net
+
+  init-vault:
+    image: hashicorp/vault:latest
+    container_name: init-vault
+    entrypoint: ["/bin/sh", "/init-vault.sh"]
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=dev-root
+    depends_on:
+      - vault
+    networks:
+      - hackaton-net
+    volumes:
+      - ./scripts/init-vault.sh:/init-vault.sh:ro
+
+networks:
+  hackaton-net:
+    driver: bridge

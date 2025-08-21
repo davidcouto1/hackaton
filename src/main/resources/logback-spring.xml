@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>graylog</graylogHost>
+        <port>12201</port>
+        <facility>simulador-api</facility>
+        <includeFullMdc>true</includeFullMdc>
+        <timestampPattern>yyyy-MM-dd HH:mm:ss.SSS</timestampPattern>
+        <level>INFO</level>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="GELF"/>
+    </root>
+</configuration>
+

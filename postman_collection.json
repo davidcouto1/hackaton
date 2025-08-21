@@ -1,0 +1,196 @@
+{
+  "info": {
+    "_postman_id": "hackaton-simulador-credito-collection",
+    "name": "Simulador de Crédito API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "admin", "type": "string" },
+      { "key": "password", "value": "admin123", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Simular Crédito",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"modeloEnvelopeSimulacao\": {\n    \"valorDesejado\": 900.00,\n    \"prazo\": 5\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/simulacoes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["simulacoes"]
+        }
+      },
+      "response": [
+        {
+          "name": "Exemplo de Retorno",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modeloEnvelopeSimulacao\": {\n    \"valorDesejado\": 900.00,\n    \"prazo\": 5\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/simulacoes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["simulacoes"]
+            }
+          },
+          "status": "200 OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": "{\n  \"modeloEnvelopeRetornoSimulacao\": {\n    \"idSimulacao\": 20180702,\n    \"codigoProduto\": 1,\n    \"descricaoProduto\": \"Produto 1\",\n    \"taxaJuros\": 0.0179,\n    \"resultadoSimulacao\": [\n      {\n        \"tipo\": \"SAC\",\n        \"parcelas\": [\n          { \"numero\": 1, \"valorAmortizacao\": 180.00, \"valorJuros\": 16.11, \"valorPrestacao\": 196.11 },\n          { \"numero\": 2, \"valorAmortizacao\": 180.00, \"valorJuros\": 12.89, \"valorPrestacao\": 192.89 },\n          { \"numero\": 3, \"valorAmortizacao\": 180.00, \"valorJuros\": 9.67, \"valorPrestacao\": 189.67 },\n          { \"numero\": 4, \"valorAmortizacao\": 180.00, \"valorJuros\": 6.44, \"valorPrestacao\": 186.44 },\n          { \"numero\": 5, \"valorAmortizacao\": 180.00, \"valorJuros\": 3.22, \"valorPrestacao\": 183.22 }\n        ]\n      },\n      {\n        \"tipo\": \"PRICE\",\n        \"parcelas\": [\n          { \"numero\": 1, \"valorAmortizacao\": 173.67, \"valorJuros\": 16.11, \"valorPrestacao\": 189.78 },\n          { \"numero\": 2, \"valorAmortizacao\": 176.78, \"valorJuros\": 13.00, \"valorPrestacao\": 189.78 },\n          { \"numero\": 3, \"valorAmortizacao\": 179.94, \"valorJuros\": 9.84, \"valorPrestacao\": 189.78 },\n          { \"numero\": 4, \"valorAmortizacao\": 183.16, \"valorJuros\": 6.62, \"valorPrestacao\": 189.78 },\n          { \"numero\": 5, \"valorAmortizacao\": 186.44, \"valorJuros\": 3.34, \"valorPrestacao\": 189.78 }\n        ]\n      }\n    ]\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Listar Simulações",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/simulacoes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["simulacoes"]
+        }
+      },
+      "response": [
+        {
+          "name": "Exemplo de Retorno",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/simulacoes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["simulacoes"]
+            }
+          },
+          "status": "200 OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": "{\n  \"pagina\": 1,\n  \"qtdRegistros\": 404,\n  \"qtdRegistrosPagina\": 200,\n  \"registros\": [\n    {\n      \"idSimulacao\": 20180702,\n      \"valorDesejado\": 900.00,\n      \"prazo\": 5,\n      \"valorTotalParcelas\": 1243.28\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Listar Simulações por Produto e Dia",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/simulacoes/por-dia?produto=credito-pessoal&data=2024-08-19",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["simulacoes", "por-dia"],
+          "query": [
+            { "key": "produto", "value": "credito-pessoal" },
+            { "key": "data", "value": "2024-08-19" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Telemetria",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/simulacoes/telemetria",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["simulacoes", "telemetria"]
+        }
+      },
+      "response": [
+        {
+          "name": "Exemplo de Retorno",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/simulacoes/telemetria",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["simulacoes", "telemetria"]
+            }
+          },
+          "status": "200 OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": "{\n  \"dataReferencia\": \"2025-07-30\",\n  \"listaEndpoints\": [\n    {\n      \"nomeApi\": \"Simulacao\",\n      \"qtdRequisicoes\": 135,\n      \"tempoMedio\": 150,\n      \"tempoMinimo\": 23,\n      \"tempoMaximo\": 860,\n      \"percentualSucesso\": 0.98\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Volume Simulado por Produto e Dia",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/simulacoes/por-dia?produto=1&data=2025-07-30",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["simulacoes", "por-dia"],
+          "query": [
+            { "key": "produto", "value": "1" },
+            { "key": "data", "value": "2025-07-30" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Exemplo de Retorno",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/simulacoes/por-dia?produto=1&data=2025-07-30",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["simulacoes", "por-dia"],
+              "query": [
+                { "key": "produto", "value": "1" },
+                { "key": "data", "value": "2025-07-30" }
+              ]
+            }
+          },
+          "status": "200 OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": "{\n  \"dataReferencia\": \"2025-07-30\",\n  \"simulacoes\": [\n    {\n      \"codigoProduto\": 1,\n      \"descricaoProduto\": \"Produto 1\",\n      \"taxaMediaJuro\": 0.189,\n      \"valorMedioPrestacao\": 300.00,\n      \"valorTotalDesejado\": 12047.47,\n      \"valorTotalCredito\": 16750.00\n    }\n  ]\n}"
+        }
+      ]
+    }
+  ]
+}
