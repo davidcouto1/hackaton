@@ -100,6 +100,10 @@ class SimulacaoServiceTest {
         Produto produto = new Produto();
         produto.setNome("Produto Teste");
         produto.setTaxaJuros(BigDecimal.valueOf(2.0));
+        produto.setValorMinimo(BigDecimal.valueOf(10000));
+        produto.setValorMaximo(BigDecimal.valueOf(50000));
+        produto.setPrazoMinimo((short) 12);
+        produto.setPrazoMaximo((short) 36);
         when(produtoService.listarProdutos()).thenReturn(Collections.singletonList(produto));
         SimulacaoRequestDTO.ModeloEnvelopeSimulacao env = new SimulacaoRequestDTO.ModeloEnvelopeSimulacao();
         env.setValorDesejado(30000.0);

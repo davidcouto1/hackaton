@@ -22,6 +22,8 @@ import org.example.dto.PaginatedResponseDTO;
 import org.example.dto.SimulacaoResumoDTO;
 import org.example.service.strategy.SimulacaoStrategy;
 import org.example.service.strategy.SimulacaoStrategyFactory;
+import org.example.dto.SimulacaoResumoCustomDTO;
+import org.example.dto.PaginatedSimulacaoResumoResponseDTO;
 
 @Service
 public class SimulacaoService {

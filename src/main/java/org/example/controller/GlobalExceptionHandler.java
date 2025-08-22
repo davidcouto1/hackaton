@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import jakarta.validation.ConstraintViolationException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -32,5 +35,24 @@ public class GlobalExceptionHandler {
         error.put("timestamp", LocalDateTime.now().toString());
         return error;
     }
-}
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Map<String, Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("erro", "Erro de validação: " + ex.getBindingResult().getFieldError().getDefaultMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return error;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Map<String, Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("erro", "Erro de validação: " + ex.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return error;
+    }
+}
