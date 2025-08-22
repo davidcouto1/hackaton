@@ -50,7 +50,8 @@ class SacSimulacaoStrategyTest {
         dados.setValorDesejado(10000.0);
         dados.setPrazo(0);
         SimulacaoResponseDTO.ResultadoSimulacao resultado = strategy.calcularParcelas(dados, 2.0);
-        assertTrue(resultado.getParcelas().isEmpty());
+        assertEquals(1, resultado.getParcelas().size());
+        assertEquals(0.0, resultado.getParcelas().get(0).getValorPrestacao(), 0.01);
     }
 
     @Test

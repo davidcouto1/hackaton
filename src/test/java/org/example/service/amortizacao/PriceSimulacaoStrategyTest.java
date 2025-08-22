@@ -111,6 +111,6 @@ class PriceSimulacaoStrategyTest {
         dados.setPrazo(1);
         SimulacaoResponseDTO.ResultadoSimulacao resultado = strategy.calcularParcelas(dados, 2.0);
         assertEquals(1, resultado.getParcelas().size());
-        assertEquals(1000.0, resultado.getParcelas().get(0).getValorAmortizacao() + resultado.getParcelas().get(0).getValorJuros(), 0.01);
+        assertEquals(1000.0, resultado.getParcelas().get(0).getValorPrestacao(), 0.01);
     }
 }

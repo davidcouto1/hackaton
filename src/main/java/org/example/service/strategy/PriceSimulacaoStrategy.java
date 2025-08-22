@@ -17,7 +17,7 @@ public class PriceSimulacaoStrategy implements SimulacaoStrategy {
         List<SimulacaoResponseDTO.Parcela> parcelas = new ArrayList<>();
         if (prazo <= 0 || valor <= 0) {
             return gerarParcelasZeradas(prazo);
-        } else if (i == 0.0) {
+        } else if (i == 0.0 || prazo == 1) {
             return gerarParcelasSemJuros(valor, prazo);
         }
         double valorPrestacao = calcularPrestacaoPrice(valor, prazo, i);
@@ -89,6 +89,9 @@ public class PriceSimulacaoStrategy implements SimulacaoStrategy {
         List<SimulacaoResponseDTO.Parcela> parcelas;
         if (prazo <= 0 || valor <= 0) {
             parcelas = gerarParcelasZeradas(prazo);
+        } else if (prazo == 1) {
+            // Para prazo 1, prestação igual ao valor solicitado, sem juros
+            parcelas = gerarParcelasSemJuros(valor, 1);
         } else if (i == 0.0) {
             parcelas = gerarParcelasSemJuros(valor, prazo);
         } else {

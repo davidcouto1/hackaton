@@ -9,6 +9,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.example.service.EventHubService;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,9 @@ public class SimulacaoControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @MockBean
+    private EventHubService eventHubService;
 
     @Test
     void deveListarSimulacoesComSucesso() {

@@ -3,6 +3,7 @@ package org.example.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
+@EnableConfigurationProperties
 @EnableJpaRepositories(
         basePackages = "org.example.repository.produto",
         entityManagerFactoryRef = "produtoEntityManagerFactory",
@@ -28,15 +31,25 @@ public class ProdutoDataSourceConfig {
         return DataSourceBuilder.create().build();
     }
 
+    @Bean(name = "produtoJpaProperties")
+    @ConfigurationProperties(prefix = "spring.produto-datasource.jpa")
+    public Map<String, String> produtoJpaProperties() {
+        return new HashMap<>();
+    }
+
     @Bean(name = "produtoEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean produtoEntityManagerFactory(
             @Qualifier("produtoDataSource") DataSource dataSource,
-            JpaProperties jpaProperties) {
+            @Qualifier("produtoJpaProperties") Map<String, String> produtoJpaProperties) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan("org.example.model.produto");
+        em.setPackagesToScan("org.example.model");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        em.setJpaPropertyMap(new HashMap<>(jpaProperties.getProperties()));
+        // Adiciona manualmente o dialect se não estiver presente
+        if (!produtoJpaProperties.containsKey("hibernate.dialect")) {
+            produtoJpaProperties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        }
+        em.setJpaPropertyMap(produtoJpaProperties);
         return em;
     }
 

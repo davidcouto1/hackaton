@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.model.Produto;
 import org.example.model.Simulacao;
 import org.example.repository.simulacao.SimulacaoRepository;
-import org.example.repository.AuditoriaRepository;
+import org.example.repository.auditoria.AuditoriaRepository;
 import org.example.model.Auditoria;
 import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.Cacheable;
@@ -165,9 +165,11 @@ public class SimulacaoService {
         List<Produto> produtosValidos = produtoService.listarProdutos().stream()
             .filter(p -> {
                 boolean valorOk = env.getValorDesejado() != null &&
+                    p.getValorMinimo() != null &&
                     BigDecimal.valueOf(env.getValorDesejado()).compareTo(p.getValorMinimo()) >= 0 &&
                     (p.getValorMaximo() == null || BigDecimal.valueOf(env.getValorDesejado()).compareTo(p.getValorMaximo()) <= 0);
                 boolean prazoOk = env.getPrazo() != null &&
+                    p.getPrazoMinimo() != null &&
                     env.getPrazo() >= p.getPrazoMinimo() &&
                     (p.getPrazoMaximo() == null || env.getPrazo() <= p.getPrazoMaximo());
                 return valorOk && prazoOk;

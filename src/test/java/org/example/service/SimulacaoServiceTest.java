@@ -5,7 +5,7 @@ import org.example.dto.SimulacaoRequestDTO;
 import org.example.dto.SimulacaoResponseDTO;
 import org.example.model.Produto;
 import org.example.model.Simulacao;
-import org.example.repository.AuditoriaRepository;
+import org.example.repository.auditoria.AuditoriaRepository;
 import org.example.repository.simulacao.SimulacaoRepository;
 import org.example.service.strategy.SimulacaoStrategy;
 import org.example.service.strategy.SimulacaoStrategyFactory;

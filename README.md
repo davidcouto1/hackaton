@@ -48,6 +48,11 @@ Este projeto é uma API REST em Java 17+ (Spring Boot) para simulação de créd
 1. Clone o repositório
 2. Compile e rode a aplicação:
    ```sh
+   mvn clean install -Pdev
+   mvn spring-boot:run -Dspring-boot.run.profiles=dev
+   ```
+   Ou, alternativamente:
+   ```sh
    mvn clean install
    mvn spring-boot:run
    ```
@@ -56,12 +61,17 @@ Este projeto é uma API REST em Java 17+ (Spring Boot) para simulação de créd
 
 ## Como rodar em diferentes ambientes (profiles)
 
-A aplicação utiliza profiles do Spring para separar configurações de desenvolvimento, teste e produção. Os arquivos de configuração estão em `src/main/resources`:
+A aplicação utiliza profiles do Spring e do Maven para separar configurações de desenvolvimento, teste e produção. Os arquivos de configuração estão em `src/main/resources`:
 - `application-dev.properties` (desenvolvimento, usa H2)
 - `application-test.properties` (testes automatizados, usa H2)
 - `application-prod.properties` (produção, usa SQL Server e EventHub reais)
 
 ### Rodando em desenvolvimento (profile dev)
+Você pode rodar usando o Maven profile:
+```sh
+mvn clean install -Pdev
+```
+Ou diretamente pelo Spring Boot:
 ```sh
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
