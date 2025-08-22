@@ -24,6 +24,8 @@ import org.example.service.strategy.SimulacaoStrategy;
 import org.example.service.strategy.SimulacaoStrategyFactory;
 import org.example.dto.SimulacaoResumoCustomDTO;
 import org.example.dto.PaginatedSimulacaoResumoResponseDTO;
+import org.example.exception.NotFoundException;
+import org.example.exception.BusinessException;
 
 @Service
 public class SimulacaoService {
@@ -32,17 +34,15 @@ public class SimulacaoService {
     private final EventHubService eventHubService;
     private final ObjectMapper objectMapper;
     private final AuditoriaRepository auditoriaRepository;
-    private final EventHubQueueProducer eventHubQueueProducer;
     private final SimulacaoStrategyFactory simulacaoStrategyFactory;
     private static final Logger logger = LoggerFactory.getLogger(SimulacaoService.class);
 
-    public SimulacaoService(ProdutoService produtoService, SimulacaoRepository simulacaoRepository, EventHubService eventHubService, ObjectMapper objectMapper, AuditoriaRepository auditoriaRepository, EventHubQueueProducer eventHubQueueProducer, SimulacaoStrategyFactory simulacaoStrategyFactory) {
+    public SimulacaoService(ProdutoService produtoService, SimulacaoRepository simulacaoRepository, EventHubService eventHubService, ObjectMapper objectMapper, AuditoriaRepository auditoriaRepository, SimulacaoStrategyFactory simulacaoStrategyFactory) {
         this.produtoService = produtoService;
         this.simulacaoRepository = simulacaoRepository;
         this.eventHubService = eventHubService;
         this.objectMapper = objectMapper;
         this.auditoriaRepository = auditoriaRepository;
-        this.eventHubQueueProducer = eventHubQueueProducer;
         this.simulacaoStrategyFactory = simulacaoStrategyFactory;
     }
 
@@ -95,7 +95,11 @@ public class SimulacaoService {
     }
 
     public void simularEnvioEventHub(String envelopeJson) {
-        eventHubQueueProducer.sendEnvelopeToQueue(envelopeJson);
+        try {
+            eventHubService.enviarMensagem(envelopeJson);
+        } catch (Exception e) {
+            logger.error("Erro ao enviar mensagem para o EventHub", e);
+        }
     }
 
     public Simulacao fluxoCompletoSimulacao(Simulacao simulacao) {
@@ -103,8 +107,8 @@ public class SimulacaoService {
         Produto produto = produtoService.listarProdutos().stream()
                 .filter(p -> p.getNome().equalsIgnoreCase(simulacao.getProduto()))
                 .findFirst().orElse(null);
-        if (produto == null) throw new RuntimeException("Produto não encontrado");
-        if (!validarDados(simulacao, produto)) throw new RuntimeException("Dados inválidos para o produto");
+        if (produto == null) throw new NotFoundException("Produto não encontrado");
+        if (!validarDados(simulacao, produto)) throw new BusinessException("Dados inválidos para o produto");
         simulacao.setTaxaJuros(produto.getTaxaJuros() != null ? produto.getTaxaJuros().doubleValue() : null);
         // Utiliza Strategy + Factory, mas não salva parcelas na entidade
         Simulacao salva = salvarSimulacao(simulacao);

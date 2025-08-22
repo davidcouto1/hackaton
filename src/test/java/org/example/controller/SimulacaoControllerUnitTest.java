@@ -28,6 +28,7 @@ class SimulacaoControllerUnitTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        org.example.filter.RateLimitFilter.resetRequestCounts();
     }
 
     @Test

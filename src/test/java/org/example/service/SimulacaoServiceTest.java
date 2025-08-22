@@ -28,7 +28,6 @@ class SimulacaoServiceTest {
     private EventHubService eventHubService;
     private ObjectMapper objectMapper;
     private AuditoriaRepository auditoriaRepository;
-    private EventHubQueueProducer eventHubQueueProducer;
     private SimulacaoStrategyFactory simulacaoStrategyFactory;
     private SimulacaoService simulacaoService;
 
@@ -39,9 +38,8 @@ class SimulacaoServiceTest {
         eventHubService = mock(EventHubService.class);
         objectMapper = new ObjectMapper();
         auditoriaRepository = mock(AuditoriaRepository.class);
-        eventHubQueueProducer = mock(EventHubQueueProducer.class);
         simulacaoStrategyFactory = mock(SimulacaoStrategyFactory.class);
-        simulacaoService = new SimulacaoService(produtoService, simulacaoRepository, eventHubService, objectMapper, auditoriaRepository, eventHubQueueProducer, simulacaoStrategyFactory);
+        simulacaoService = new SimulacaoService(produtoService, simulacaoRepository, eventHubService, objectMapper, auditoriaRepository, simulacaoStrategyFactory);
     }
 
     @Test

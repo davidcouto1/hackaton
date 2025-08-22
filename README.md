@@ -569,6 +569,16 @@ O projeto suporta múltiplos ambientes (profiles) para facilitar o desenvolvimen
 
 Assim, sempre utilize o comando completo conforme os exemplos acima para evitar esse erro.
 
+## Observação importante
+Se não conseguir rodar a aplicação com os comandos acima, execute exatamente assim, linha por linha:
+
+```
+mvn clean install -Pdev
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+Assim você garante que o perfil de desenvolvimento será ativado corretamente.
+
 ## Qualidade, Testes e Observabilidade
 
 ### Testes Automatizados
@@ -668,9 +678,10 @@ Este projeto utiliza o HashiCorp Vault para gerenciar segredos sensíveis, como 
 
 ### Como adicionar segredos no Vault
 
-1. Adicione a senha do RabbitMQ no Vault:
+1. Adicione a senha do banco de dados e do EventHub no Vault:
    ```sh
-   vault kv put secret/hackaton spring.rabbitmq.password=guest
+   vault kv put secret/hackaton spring.datasource.url='jdbc:sqlserver://sqlserver:1433;databaseName=hack' spring.datasource.username='hack' spring.datasource.password='Password23'
+   vault kv put secret/hackaton eventhub.connection-string='Endpoint=sb://eventhack.servicebus.windows.net/;SharedAccessKeyName=hack;SharedAccessKey=HeHeVaVqyVkntO2FnjQcs2Ilh/4MUDo4y+AEhKp8z+g=;EntityPath=simulacoes' eventhub.name='simulacoes'
    ```
    Você pode adicionar outros segredos conforme necessário, usando o mesmo padrão.
 

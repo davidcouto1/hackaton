@@ -22,11 +22,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/simulacoes")
 public class SimulacaoController {
     private final SimulacaoService simulacaoService;
+    private static final Logger logger = LoggerFactory.getLogger(SimulacaoController.class);
 
     public SimulacaoController(SimulacaoService simulacaoService) {
         this.simulacaoService = simulacaoService;
@@ -64,17 +67,20 @@ public class SimulacaoController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Void> handleValidationException(MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex) {
+        logger.error("Erro de validação", ex);
+        return ResponseEntity.badRequest().body(java.util.Collections.singletonMap("erro", "Erro de validação: " + ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Void> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
+        logger.error("Erro interno do servidor", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(java.util.Collections.singletonMap("erro", ex.getMessage()));
     }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Object> handleBusinessException(BusinessException ex) {
+        logger.error("Erro de negócio", ex);
         return ResponseEntity.badRequest().body(java.util.Collections.singletonMap("erro", ex.getMessage()));
     }
 

@@ -35,6 +35,7 @@ class SimulacaoControllerTest {
 
     @BeforeEach
     void setup() {
+        org.example.filter.RateLimitFilter.resetRequestCounts();
         responseDTO = new SimulacaoResponseDTO();
         SimulacaoResponseDTO.ModeloEnvelopeRetornoSimulacao env = new SimulacaoResponseDTO.ModeloEnvelopeRetornoSimulacao();
         env.setIdSimulacao(1L);

@@ -118,15 +118,6 @@ services:
     networks:
       - hackaton-net
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - hackaton-net
-
   vault:
     image: hashicorp/vault:latest
     container_name: dev-vault
